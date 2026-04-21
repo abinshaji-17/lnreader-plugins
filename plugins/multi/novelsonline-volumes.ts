@@ -196,3 +196,4 @@ class NovelsonlinePlugin implements Plugin.PluginBase {
 }
 
 export default new NovelsonlinePlugin();
+
