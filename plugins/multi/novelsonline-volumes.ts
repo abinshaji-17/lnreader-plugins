@@ -8,17 +8,27 @@ class NovelsonlinePlugin implements Plugin.PluginBase {
   name = "Novelsonline (Volumes)";
   icon = "src/multi/novelsonline-volumes/icon.png";
   site = "https://novelsonline.org";
-  version = "1.0.0";
+  version = "1.0.1";
 
   // ---- Helpers ----
 
   private async safeFetch(url: string, init?: RequestInit): Promise<CheerioAPI> {
-    const res = await fetchApi(url, init);
+    const res = await fetchApi(url, {
+      ...init,
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+        ...(init?.headers || {}),
+      },
+    });
+
     if (!res.ok) {
       throw new Error(
         `Could not reach site (${res.status}) – try opening in WebView.`
       );
     }
+
     const $ = load(await res.text());
 
     if (!$("title").length) {
@@ -133,7 +143,6 @@ class NovelsonlinePlugin implements Plugin.PluginBase {
 
       const path = this.toRelativePath(href);
 
-      // Extract volume number from URL e.g. /volume-2/chapter-10/
       const volMatch = path.match(/\/volume-(\d+(?:\.\d+)?)\//i);
       const volumeNo = volMatch ? parseFloat(volMatch[1]) : undefined;
 
@@ -196,4 +205,5 @@ class NovelsonlinePlugin implements Plugin.PluginBase {
 }
 
 export default new NovelsonlinePlugin();
+
 
